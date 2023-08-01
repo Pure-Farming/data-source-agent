@@ -1,0 +1,76 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col">
+            <h5>File Source Configuration</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label for="filePath" class="form-label">File Path</label>
+            <input type="text" class="form-control" id="filePath" aria-describedby="filePathHelp" @bind="Item.Path" />
+            <div id="filePathHelp" class="form-text">The path to where files will be retrieved from, e.g. /etc/pure-farming</div>
+        </div>
+        <div class="col">
+            <label for="fileType" class="form-label">File Type</label>
+            <select id="fileType" class="form-select" aria-label="File Type" @bind="Item.FileType">
+                <option selected>Select the File Type</option>
+                <option value=".csv">CSV</option>
+                <option value=".tsv">TSV</option>
+                <option value=".json">JSON</option>
+                <option value=".xml">XML</option>
+            </select>
+            <div id="fileTypeHelp" class="form-text">The name of the Pure Farming Data source, e.g. farm-metrics</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" @bind="watchDirectory" id="watchDirectory" />
+                <label class="form-check-label" for="watchDirectory">Watch Directory?</label>
+            </div>
+            <div class="form-text">Whether or not to watch the provided directory for changes.</div>
+        </div>
+        @if (watchDirectory)
+        {
+
+            <div class="col">
+                <label for="submissionDelay" class="form-label">Submission Delay <small class="text-body-secondary">(Minutes)</small></label>
+                <select id="submissionDelay" class="form-select" aria-label="Submission Delay" @bind="Item.SubmissionDelay" disabled="@(watchDirectory == false)">
+                    <option value="0">No-Delay</option>
+                    <option value="60">1 Minute</option>
+                    <option value="120">2 Minutes</option>
+                    <option value="180">3 Minutes</option>
+                    <option value="240">4 Minutes</option>
+                    <option value="300">5 Minutes</option>
+                </select>
+                <div id="submissionDelayHelp" class="form-text">How long to delay a file being sent, from when the change is detected on disk.</div>
+            </div>
+        }
+        else
+        {
+            <div class="col">
+                <label for="submissionDelay" class="form-label">Polling Expression <small class="text-body-secondary">(CRON)</small></label>
+                <input class="form-control" type="text" @bind="Item.CronExpression" />
+                <div id="submissionDelayHelp" class="form-text">How often to check the specified directory for new files.</div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, AllowNull]
+    public Common.Configuration.FileConfiguration Item { get; set; }
+
+    private bool watchDirectory
+    {
+        get
+        {
+            return Item?.WatchDirectory ?? false;
+        }
+        set
+        {
+            if (Item == null) return;
+            Item.WatchDirectory = value;
+        }
+    }
+}

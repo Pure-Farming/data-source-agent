@@ -1,0 +1,121 @@
+﻿@page "/configure"
+@implements IAsyncDisposable
+@inject IDataSourceConfigurationService DataSourceConfigurationService
+@inject IConfigurationService ConfigurationService
+@inject IJSRuntime JS
+
+<PageTitle>Pure Farming .: Configuration</PageTitle>
+
+<div class="container">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toastSaveFailed" class="toast align-items-center text-bg-danger border-0 position-relative top-0 end-0" role="alert" aria-live="polite" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Failed to Save Configuration
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        <div id="toastSaveSuccess" class="toast align-items-center text-bg-success border-0 position-relative top-0 end-0" role="alert" aria-live="polite" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Successfully Saved Configuration!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h2>Configuration</h2>
+        </div>
+        <div class="col d-md-flex justify-content-md-end">
+            <button class="btn btn-outline-primary align-right" @onclick="OnFormSubmit">Save</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label for="dataSourceName" class="form-label">Name</label>
+            <input type="text" class="form-control" id="dataSourceName" aria-describedby="dataSourceNameHelp" @bind="configuration.Name" />
+            <div id="dataSourceNameHelp" class="form-text">The name of the Pure Farming Data source, e.g. farm-metrics</div>
+        </div>
+        <div class="col">
+            <label for="dataSourceFullName" class="form-label">Full Name</label>
+            <div class="input-group">
+                <label class="input-group-text">com.purefarming.data-source.</label>
+                <input class="form-control" id="dataSourceFullName" aria-describedby="dataSourceFullNameHelp" @bind="configuration.FullName" />
+            </div>
+            <div id="dataSourceFullNameHelp" class="form-text">The full, reverse DNS name of the Pure Farming Data source, e.g. com.purefarming.data-source.farm-metrics</div>
+        </div>
+    </div>
+    <div class="row"><div class="col">&nbsp;</div></div>
+    <div class="accordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelAwsInfo" aria-controls="panelAwsInfo">
+                    AWS Configuration
+                </button>
+            </h2>
+            <div class="accordion-collapse collapse hide" id="panelAwsInfo">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-text">The configuration needed in order to communicate successfully with AWS. This includes the credentials and the S3 bucket that data will eventually be pushed into.</label>
+                        </div>
+                    </div>
+                    <div class="row"><div class="col">&nbsp;</div></div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="awsSecretId" class="form-label">AWS Secret ID</label>
+                            <input type="text" class="form-control" id="awsSecretId" aria-describedby="awsSecretIdHelp" @bind="configuration.Aws.SecretId" />
+                            <div id="awsSecretIdHelp" class="form-text">The AWS Secret ID that you have been provided with.</div>
+                        </div>
+                        <div class="col">
+                            <label for="awsSecretKey" class="form-label">AWS Secret Key</label>
+                            <input type="text" class="form-control" id="awsSecretKey" aria-describedby="awsSecretKeyHelp" @bind="configuration.Aws.SecretKey" />
+                            <div id="awsSecretIdHelp" class="form-text">The AWS Secret Key that you have been provided with.</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="awsS3Bucket" class="form-label">S3 Bucket ARN</label>
+                            <input type="text" class="form-control" id="awsS3Bucket" aria-describedby="awsS3BucketHelp" @bind="configuration.Aws.S3BucketArn" />
+                            <div id="awsSecretIdHelp" class="form-text">The S3 bucket to drop files into for processing.</div>
+                        </div>
+                        <div class="col">&nbsp;</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelConnectionInfo" aria-controls="panelConnectionInfo">
+                    Connection
+                </button>
+            </h2>
+            <div class="accordion-collapse collapse hide" id="panelConnectionInfo">
+                <div class="accordion-body">
+                    <div class="row">
+                        <div class="col">
+                            <label for="dataSourceType" class="form-label">Connection Type</label>
+                            <select class="form-select" aria-label="Connection Type" @onchange="OnDataSourceTypeChanged">
+                                @foreach (var t in ConfigurationTypes)
+                                {
+                                    <option value="@t.Item1" selected="@(t.Item1 == configurationDisplayTypeName)">@t.Item2</option>
+                                }
+                            </select>
+                            <div id="dataSourceTypeHelp" class="form-text">The type of the data source.</div>
+                        </div>
+                        <div class="col">&nbsp;</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">&nbsp;</div>
+                    </div>
+
+                    <DynamicComponent Type="configurationDisplayType" Parameters="connectionConfiguration"></DynamicComponent>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

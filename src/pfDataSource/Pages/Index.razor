@@ -1,0 +1,75 @@
+﻿@page "/"
+@inject IDataSourceConfigurationService ConfigurationService
+
+<PageTitle>Pure Farming .: Data Connector</PageTitle>
+
+<div class="container">
+    @if (configuration.DisplayName is null)
+    {
+        <div class="row">
+            <div class="col">
+                <h2>First Time Setup</h2>
+            </div>
+            <div class="col d-md-flex justify-content-md-end">
+                <button class="btn btn-outline-primary align-right" @onclick="OnFormSubmit">Save</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                Please setup your Data Source for the first time.<br />
+                All we need to know at this stage is the display name you want to use.
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">&nbsp;</div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label for="displayName" class="form-label">Display Name</label>
+                <input type="text" class="form-control" id="displayName" aria-describedby="displayNameHelp" @bind="displayName" />
+                <div id="displayNameHelp" class="form-text">The display name of the Pure Farming Data source, e.g. My Farm Software</div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label for="tempFilesPath" class="form-label">Temp Files Path</label>
+                <input type="text" class="form-control" id="tempFilesPath" aria-describedby="tempFilesPathHelp" @bind="tempFilesPath" />
+                <div id="tempFilesPathHelp" class="form-text">The path which Pure Farming uses to store files temporarily before they are sent.</div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div>
+            <h2>@configuration.DisplayName</h2>
+
+            <span>Welcome to your new app.</span>
+        </div>
+    }
+</div>
+
+@code {
+    private string displayName;
+    private string tempFilesPath;
+    private Services.Models.DataSourceConfiguration configuration;
+
+    private async Task OnFormSubmit()
+    {
+        configuration.DisplayName = displayName;
+        await ConfigurationService.SaveAsync(configuration);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        configuration = await ConfigurationService.GetAsync();
+        if (configuration is null)
+        {
+            configuration = new Services.Models.DataSourceConfiguration()
+            {
+                DisplayType = typeof(Pages.Partials.EmptyConfiguration).FullName,
+                SourceType = typeof(Common.Configuration.EmptyConfiguration).Name
+            };
+            tempFilesPath = AppDomain.CurrentDomain.BaseDirectory;
+        }
+    }
+}
