@@ -19,20 +19,7 @@ namespace pfDataSource.Test
 
         public EncryptionProviderTests()
         {
-
-            CryptoKeys keys = new CryptoKeys();
-
-            using (var aes = Aes.Create())
-            {
-                aes.GenerateIV();
-                aes.GenerateKey();
-
-                keys.Key = aes.Key;
-                keys.InitialisationVector = aes.IV;
-            }
-
-            _encryptionProvider = new EncryptionProvider(keys);
-
+            _encryptionProvider = new EncryptionProvider(CommonTestUtils.GetCryptoKeys());
         }
 
 
