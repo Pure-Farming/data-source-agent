@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System;
 using pfDataSource.Db.Models;
 using System.Configuration;
+using Serilog;
+using Serilog.Sinks.Debug;
 
 namespace pfDataSource.Services
 {
@@ -14,17 +16,20 @@ namespace pfDataSource.Services
 	{
         private readonly ApplicationDbContext context;
         internal readonly IEncryptionProvider encryptionProvider;
+        internal readonly ILogger logger;
 
         public DataSourceConfigurationService() { }
 
 
         public DataSourceConfigurationService(
             ApplicationDbContext context,
-            IEncryptionProvider encryptionProvider)
-		{
+            IEncryptionProvider encryptionProvider,
+            ILogger logger)
+        {
             this.context = context;
             this.encryptionProvider = encryptionProvider;
-		}
+            this.logger = logger;
+        }
 
         public async Task<DataSourceConfiguration> GetAsync()
         {
@@ -92,7 +97,6 @@ namespace pfDataSource.Services
 
             var secrectId = string.IsNullOrWhiteSpace(configuration.Aws?.SecretId) ? null : encryptionProvider.Encrypt(configuration.Aws.SecretId);
             var secretKey = string.IsNullOrWhiteSpace(configuration.Aws?.SecretKey) ? null : encryptionProvider.Encrypt(configuration.Aws.SecretKey);
-
 
             found = BuildSourceObject(found, configuration, secrectId, secretKey);
 
