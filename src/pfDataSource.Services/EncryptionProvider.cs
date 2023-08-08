@@ -6,7 +6,9 @@ using pfDataSource.Db;
 using pfDataSource.Db.Models;
 using pfDataSource.Common;
 using System;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("pfDataSource.Test")]
 namespace pfDataSource.Services
 {
     public interface IEncryptionProvider
@@ -15,9 +17,15 @@ namespace pfDataSource.Services
         string Decrypt(string input);
     }
 
+    
     public class EncryptionProvider : IEncryptionProvider
     {
-        private readonly CryptoKeys keys;
+        internal readonly CryptoKeys keys;
+
+        public EncryptionProvider(CryptoKeys keys)
+        {
+            this.keys = keys;
+        }
 
         public EncryptionProvider(ApplicationDbContext context)
         {

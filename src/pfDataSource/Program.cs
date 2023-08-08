@@ -9,8 +9,13 @@ using pfDataSource.Services;
 using pfDataSource;
 using Amazon.S3;
 using Amazon.Extensions.NETCore.Setup;
+using MoA.Platform.Onboarding.Common;
+using Serilog;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var logger = Log.Logger = ConsoleLoggerFactory.CreateConsoleLogger();
 
 builder.Configuration
     .AddJsonFile("appsettings.json")
@@ -24,10 +29,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite
     .AddDatabaseDeveloperPageExceptionFilter()
     .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddHangfire(x => x.UseSQLiteStorage(connectionString, new SQLiteStorageOptions
 {
     SchemaName = "hangfire"
 }));
+
 builder.Services.AddHangfireServer();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -41,6 +48,8 @@ builder.Services.AddSingleton<IAwsCredentialsService, AwsCredentialsService>();
 builder.Services.AddTransient(async p => await p.GetService<IAwsCredentialsService>().GetCredentialsAsync());
 builder.Services.AddAWSService<IAmazonS3>(ServiceLifetime.Transient);
 builder.Services.AddScoped<IPushToAwsService, PushToAwsService>();
+builder.Services.AddSingleton<Serilog.ILogger>(logger);
+
 
 var app = builder.Build();
 GlobalConfiguration.Configuration.UseActivator(new DIJobActivator(app.Services));
