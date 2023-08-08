@@ -14,12 +14,15 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.DataProtection;
+using pfDataSource.Services.Models;
 
 namespace pfDataSource.Test
 {
     public class DataSourceConfigurationServiceTests
     {
         private SourceConfiguration _sourceConfiguration;    
+
+        private Services.Models.DataSourceConfiguration _dataSourceConfiguration;
 
         public DataSourceConfigurationServiceTests() {
 
@@ -35,6 +38,22 @@ namespace pfDataSource.Test
                 AwsSecrectId = "123456789",
                 AwsSecretKey = "some-secret-key",
                 AwsS3BucketArn = "aws::arn"
+            };
+
+            _dataSourceConfiguration = new Services.Models.DataSourceConfiguration
+            {
+                DisplayName = "Test",
+                Name = "Test Source",
+                FullName = "Full Test Source",
+                SourceType = "test-type",
+                DisplayType = "test",
+                TempFilesPath = "/local/dir",
+                Aws = new Services.Models.DataSourceConfiguration.AwsConfiguration
+                {
+                    S3BucketArn = "aws::arn",
+                    SecretId = "123456789",
+                    SecretKey = "some-secret-key"
+                }
             };
 
         }
@@ -76,30 +95,31 @@ namespace pfDataSource.Test
         }
 
         [Fact]
-
-        public void DataSourceConfigurationServiceTests_BuildSourceObject_Returns_Valid_SourceConfiguration_For_Update()
+        public void DataSourceConfigurationServiceTests_BuildConfigurationObject_Returns_Valid_SourceConfiguration_With_Configuration()
         {
-    
-            var dataSourceConfiguration = new Services.Models.DataSourceConfiguration
-            {
-                DisplayName = _sourceConfiguration.DisplayName,
-                Name = _sourceConfiguration.PureFarmingSourceName,
-                FullName = _sourceConfiguration.PureFarmingFullSourceName,
-                SourceType = _sourceConfiguration.SourceType,
-                DisplayType = _sourceConfiguration.DisplayType,
-                TempFilesPath = _sourceConfiguration.TempFilesPath,
-                Aws = new Services.Models.DataSourceConfiguration.AwsConfiguration
-                {
-                    S3BucketArn = _sourceConfiguration.AwsS3BucketArn,
-                    SecretId = _sourceConfiguration.AwsSecrectId,
-                    SecretKey = _sourceConfiguration.AwsSecretKey
-                }
-            };
-
 
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, dataSourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
+            // Test with configuration object
+            _sourceConfiguration.Configuration = JsonConvert.SerializeObject(new { prop1 = "value1", prop2 = "value2" });
+
+            var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey, typeof(object));
+
+            result.Should().NotBeNull();
+
+            result.Configuration.Should().NotBeNull();
+
+            JsonConvert.SerializeObject(result.Configuration).Should().Be(_sourceConfiguration.Configuration);
+
+        }
+
+            [Fact]
+        public void DataSourceConfigurationServiceTests_BuildSourceObject_Returns_Valid_SourceConfiguration_For_Update()
+        {
+    
+            var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
+
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
 
             result.Should().NotBeNull();
 
@@ -113,19 +133,23 @@ namespace pfDataSource.Test
             result.AwsSecrectId.Should().Be("123456789");
             result.AwsSecretKey.Should().Be("some-secret-key");
             result.AwsS3BucketArn.Should().Be("aws::arn");
+            result.Configuration.Should().BeNull();
 
-            _sourceConfiguration.Configuration = JsonConvert.SerializeObject(new { prop1 = "value1", prop2 = "value2" });
+        }
 
-            dataSourceConfiguration.Configuration = new { prop1 = "value1", prop2 = "value2" };
+        [Fact]
+        public void DataSourceConfigurationServiceTests_BuildSourceObject_Returns_Valid_SourceConfiguration_For_Update_With_Configuration()
+        { 
 
-            var result2 = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, dataSourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
+            var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
+            _dataSourceConfiguration.Configuration = new { prop1 = "value1", prop2 = "value2" };
 
-            result2.Should().NotBeNull();
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
 
-            result2.Configuration.Should().NotBeNull();
+            result.Should().NotBeNull();
 
-            result2.Configuration.Should().Be(_sourceConfiguration.Configuration);
+            result.Configuration.Should().Be(_sourceConfiguration.Configuration);
 
 
         }
@@ -138,27 +162,9 @@ namespace pfDataSource.Test
             // Reset SourceConfiguration for create testing
             _sourceConfiguration = new SourceConfiguration();
 
-
-            var dataSourceConfiguration = new Services.Models.DataSourceConfiguration
-            {
-                DisplayName = "Test",
-                Name = "Test Source",
-                FullName = "Full Test Source",
-                SourceType = "test-type",
-                DisplayType = "test",
-                TempFilesPath = "/local/dir",
-                Aws = new Services.Models.DataSourceConfiguration.AwsConfiguration
-                {
-                    S3BucketArn = "aws::arn",
-                    SecretId = "123456789",
-                    SecretKey = "some-secret-key"
-                }
-            };
-
-
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, dataSourceConfiguration, "123456789", "some-secret-key");
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, "123456789", "some-secret-key");
 
             result.Should().NotBeNull();
 
@@ -171,17 +177,27 @@ namespace pfDataSource.Test
             result.AwsSecrectId.Should().Be("123456789");
             result.AwsSecretKey.Should().Be("some-secret-key");
             result.AwsS3BucketArn.Should().Be("aws::arn");
+            result.Configuration.Should().BeNull();
 
-           
-            dataSourceConfiguration.Configuration = new { prop1 = "value1", prop2 = "value2" };
+        }
 
-            var result2 = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, dataSourceConfiguration, "123456789", "some-secret-key");
+        [Fact]
 
-            result2.Should().NotBeNull();
+        public void DataSourceConfigurationServiceTests_BuildSourceObject_Returns_Valid_SourceConfiguration_For_Create_with_Configuration()
+        {
 
-            result2.Configuration.Should().NotBeNull();
+            // Reset SourceConfiguration for create testing
+            _sourceConfiguration = new SourceConfiguration();
 
-            result2.Configuration.Should().Be(_sourceConfiguration.Configuration);
+            _dataSourceConfiguration.Configuration = new { prop1 = "value1", prop2 = "value2" };
+
+            var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
+
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, "123456789", "some-secret-key");
+
+            result.Should().NotBeNull();
+
+            result.Configuration.Should().Be(_sourceConfiguration.Configuration);
 
         }
 
