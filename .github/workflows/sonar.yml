@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir ./sonar
           mkdir ./sonar/scanner
-          dotnet nuget update source moa-platform-backend -u az -p "${{ secrets.AZURE_DEVOPS_TOKEN }}" --configfile "NuGet.config" --store-password-in-clear-text
+          dotnet nuget update source moa-platform-backend -u az -p "${{ secrets.SONAR_TOKEN }}" --configfile "NuGet.config" --store-password-in-clear-text
           dotnet tool install dotnet-sonarscanner --tool-path ./.sonar/scanner
       - name: Cache Coverlet
         id: cache-coverlet
