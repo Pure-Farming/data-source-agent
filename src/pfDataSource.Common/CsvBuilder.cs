@@ -75,6 +75,11 @@ namespace pfDataSource.Common
 				return Task.FromResult(false);
 			}
 		}
+
+		public StringBuilder GetString()
+		{
+			return @string;	
+		}
 	}
 }
 
