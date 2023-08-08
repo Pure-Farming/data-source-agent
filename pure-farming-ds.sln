@@ -10,7 +10,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "pfDataSource.Db", "src\pfDa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "pfDataSource.Services", "src\pfDataSource.Services\pfDataSource.Services.csproj", "{1CECF07C-2E64-4915-9A4A-067CE7C9EDB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pfDataSource.Test", "pfDataSource.Test\pfDataSource.Test.csproj", "{624B8F59-6755-4440-93A4-F699ACB83765}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "pfDataSource.Test", "pfDataSource.Test\pfDataSource.Test.csproj", "{624B8F59-6755-4440-93A4-F699ACB83765}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{161E35EA-6315-4F20-B4E3-17B6A9A52326}"
+	ProjectSection(SolutionItems) = preProject
+		NuGet.config = NuGet.config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
