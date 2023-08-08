@@ -1,0 +1,50 @@
+
+trigger:
+- main
+
+resources:
+- repo: self
+
+# Will run on PR
+pr:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+
+jobs:
+  - job: UnitTests
+    displayName: Unit Tests
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - task: UseDotNet@2
+        displayName: Use dotnet 7
+        inputs:
+          packageType: 'sdk'
+          version: '7.0.x'
+
+      - task: DotNetCoreCLI@2
+        displayName: Restore Test Nuget Packages
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)/pfDataSource.Test/**/*.csproj'
+          feedsToUse: 'config'
+          nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
+
+      - task: DotNetCoreCLI@2
+        displayName: Run Unit Tests (Application)
+        inputs:
+          command: 'test'
+          arguments: '--collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura'
+          publishTestResults: true
+          projects: '$(Build.SourcesDirectory)/pfDataSource.Test/**/*.csproj'
+          testRunTitle: 'Unit Tests'
+
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish code coverage report'
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+
