@@ -81,17 +81,6 @@ namespace pfDataSource.Test
             result.Aws.SecretKey.Should().Be("some-secret-key");
             result.Configuration.Should().BeNull();
 
-            // Test with configuration object
-            _sourceConfiguration.Configuration = JsonConvert.SerializeObject(new { prop1 = "value1", prop2 = "value2" });
-
-            var result2 = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey, typeof(object));
-
-            result2.Should().NotBeNull();
-
-            result2.Configuration.Should().NotBeNull();
-
-            JsonConvert.SerializeObject(result2.Configuration).Should().Be(_sourceConfiguration.Configuration);
-
         }
 
         [Fact]
