@@ -62,7 +62,6 @@ namespace pfDataSource.Test
         [Fact]
         public void DataSourceConfigurationServiceTests_BuildConfigurationObject_Returns_Valid_SourceConfiguration()
         {
-            // Test without configuration object
            
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
