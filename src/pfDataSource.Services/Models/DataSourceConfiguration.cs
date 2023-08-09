@@ -1,15 +1,23 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace pfDataSource.Services.Models
 {
 	public class DataSourceConfiguration
 	{
 		public int Id { get; set; }
-		public string DisplayName { get; set; }
-		public string Name { get; set; }
-		public string FullName { get; set; }
+
+        public string DisplayName { get; set; }
+   
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public string FullName { get; set; }
 		public string SourceType { get; set; }
 		public string DisplayType { get; set; }
-		public string TempFilesPath { get; set; }
+
+        public string TempFilesPath { get; set; }
 		public AwsConfiguration Aws { get; set; }
 		public object Configuration { get; set; }
 

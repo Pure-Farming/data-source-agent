@@ -3,6 +3,7 @@ using Hangfire;
 using Hangfire.Storage;
 using pfDataSource.Common.Configuration;
 using pfDataSource.Services.Jobs;
+using pfDataSource.Services.Models;
 
 namespace pfDataSource.Services
 {

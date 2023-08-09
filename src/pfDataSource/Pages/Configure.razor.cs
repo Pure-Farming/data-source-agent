@@ -1,39 +1,66 @@
 ﻿using System;
+using System.Configuration;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.JSInterop;
+using pfDataSource.Common;
 
 namespace pfDataSource.Pages
 {
 	public partial class Configure
 	{
         private Services.Models.DataSourceConfiguration configuration;
+        private Services.Models.FileConfiguration fileConfiguration;
+        private Boolean watchDirectory = true;
+
         private string configurationDisplayTypeName = typeof(Partials.EmptyConfiguration).FullName;
         private Type configurationDisplayType => Type.GetType(configurationDisplayTypeName);
         private Dictionary<string, object> connectionConfiguration = new Dictionary<string, object>();
         private IJSObjectReference module;
 
-        private List<Tuple<string, string>> ConfigurationTypes = new List<Tuple<string, string>>
-        {
-            new Tuple<string, string>(typeof(Pages.Partials.EmptyConfiguration).FullName, "Select the Connection Type"),
-            new Tuple<string, string>(typeof(Pages.Partials.FileConfiguration).FullName, "File"),
-            new Tuple<string, string>(typeof(Pages.Partials.DatabaseConfiguration).FullName, "Database")
-        };
-
+     
         protected override async Task OnInitializedAsync()
         {
             configuration = await DataSourceConfigurationService.GetAsync();
             if (configuration is null) configuration = new Services.Models.DataSourceConfiguration();
             configuration.FullName = configuration.FullName?.Replace("com.purefarming.data-source.", string.Empty);
+
+            fileConfiguration = new Services.Models.FileConfiguration();
+
+            if (configuration.Configuration is not null)
+            {
+                fileConfiguration = (Services.Models.FileConfiguration)configuration.Configuration;
+                watchDirectory = fileConfiguration.WatchDirectory;
+            }
+
             OnDataSourceTypeChanged(new ChangeEventArgs()
             {
                 Value = configuration.DisplayType
             });
         }
 
+        private void HandleValidSubmit() {
+            OnFormSubmit();
+        }
+
         private async Task OnFormSubmit()
         {
-            try
-            {
+           
+            try{
+
+                if (watchDirectory)
+                {
+                    fileConfiguration.CronExpression = string.Empty;
+                    fileConfiguration.WatchDirectory = true;
+                }
+                else
+                {
+                    fileConfiguration.SubmissionDelay = 0;
+                    fileConfiguration.WatchDirectory = false;
+                }
+
+                configuration.Configuration = fileConfiguration;
+
                 await DataSourceConfigurationService.SaveAsync(configuration);
                 await ConfigurationService.Configure();
                 await module.InvokeVoidAsync("showToast", "toastSaveSuccess", true);

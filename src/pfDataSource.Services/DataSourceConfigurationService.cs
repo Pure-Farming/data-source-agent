@@ -64,7 +64,7 @@ namespace pfDataSource.Services
                 },
                 Configuration = found.Configuration is null ?
                     null :
-                    JsonConvert.DeserializeObject(found.Configuration, sourceType)
+                    JsonConvert.DeserializeObject<Models.FileConfiguration>(found.Configuration)
             };
         }
 

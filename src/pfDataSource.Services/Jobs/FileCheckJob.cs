@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using pfDataSource.Common.Configuration;
+using pfDataSource.Services.Models;
 
 namespace pfDataSource.Services.Jobs
 {
