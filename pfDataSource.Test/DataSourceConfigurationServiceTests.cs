@@ -15,12 +15,15 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.DataProtection;
 using pfDataSource.Services.Models;
+using System.ComponentModel.DataAnnotations;
+using Xunit.Sdk;
 
 namespace pfDataSource.Test
 {
     public class DataSourceConfigurationServiceTests
     {
-        private SourceConfiguration _sourceConfiguration;    
+        private SourceConfiguration _sourceConfiguration;
+        private FileConfiguration _fileConfiguration;
 
         private Services.Models.DataSourceConfiguration _dataSourceConfiguration;
 
@@ -56,6 +59,16 @@ namespace pfDataSource.Test
                 }
             };
 
+
+            _fileConfiguration = new FileConfiguration
+            {
+                Path = "C:\\test\\dir",
+                FileType = "CSV",
+                SubmissionDelay = 0,
+                WatchDirectory = false,
+                CronExpression = "* * * * *"
+            };
+
         }
 
 
@@ -89,7 +102,7 @@ namespace pfDataSource.Test
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
             // Test with configuration object
-            _sourceConfiguration.Configuration = JsonConvert.SerializeObject(new { prop1 = "value1", prop2 = "value2" });
+            _sourceConfiguration.Configuration = JsonConvert.SerializeObject(_fileConfiguration);
 
             var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey, typeof(object));
 
@@ -131,7 +144,7 @@ namespace pfDataSource.Test
 
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            _dataSourceConfiguration.Configuration = new { prop1 = "value1", prop2 = "value2" };
+            _dataSourceConfiguration.Configuration = _fileConfiguration;
 
             var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
 
@@ -177,7 +190,7 @@ namespace pfDataSource.Test
             // Reset SourceConfiguration for create testing
             _sourceConfiguration = new SourceConfiguration();
 
-            _dataSourceConfiguration.Configuration = new { prop1 = "value1", prop2 = "value2" };
+            _dataSourceConfiguration.Configuration = _fileConfiguration;
 
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 

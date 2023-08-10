@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using System.ComponentModel.DataAnnotations;
+
 
 namespace pfDataSource.Services.Models
 {
@@ -13,10 +15,9 @@ namespace pfDataSource.Services.Models
 		public bool WatchDirectory { get; set; }
 
         [Required]
-      
-        [RegularExpression(@"^((\*|\?|\d+((\/|\-){0,1}(\d+))*)\s*){5}$", ErrorMessage = "Cron expression must be in the POSIX format.")]
-      
+        [RegularExpression(@"^((\*|\?|\d+((\/|\-){0,1}(\d+))*)\s*){5}$", ErrorMessage = "Cron expression must be in the POSIX format.")]      
         public string CronExpression { get; set; }
+
 	}
 }
 
