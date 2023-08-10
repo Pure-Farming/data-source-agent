@@ -50,13 +50,7 @@ namespace pfDataSource.Test
                 FullName = "Full Test Source",
                 SourceType = "test-type",
                 DisplayType = "test",
-                TempFilesPath = "/local/dir",
-                Aws = new Services.Models.DataSourceConfiguration.AwsConfiguration
-                {
-                    S3BucketArn = "aws::arn",
-                    SecretId = "123456789",
-                    SecretKey = "some-secret-key"
-                }
+                TempFilesPath = "/local/dir"
             };
 
 
@@ -78,7 +72,7 @@ namespace pfDataSource.Test
            
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
+            var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration);
 
             result.Should().NotBeNull();
 
@@ -88,9 +82,6 @@ namespace pfDataSource.Test
             result.TempFilesPath.Should().Be("/local/dir");
             result.Name.Should().Be("Test Source");
             result.FullName.Should().Be("Full Test Source");
-            result.Aws.S3BucketArn.Should().Be("aws::arn");
-            result.Aws.SecretId.Should().Be("123456789");
-            result.Aws.SecretKey.Should().Be("some-secret-key");
             result.Configuration.Should().BeNull();
 
         }
@@ -104,7 +95,7 @@ namespace pfDataSource.Test
             // Test with configuration object
             _sourceConfiguration.Configuration = JsonConvert.SerializeObject(_fileConfiguration);
 
-            var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey, typeof(object));
+            var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration);
 
             result.Should().NotBeNull();
 
@@ -120,7 +111,7 @@ namespace pfDataSource.Test
     
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration);
 
             result.Should().NotBeNull();
 
@@ -146,12 +137,11 @@ namespace pfDataSource.Test
 
             _dataSourceConfiguration.Configuration = _fileConfiguration;
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration);
 
             result.Should().NotBeNull();
 
             result.Configuration.Should().Be(_sourceConfiguration.Configuration);
-
 
         }
 
@@ -165,7 +155,7 @@ namespace pfDataSource.Test
 
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, "123456789", "some-secret-key");
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration);
 
             result.Should().NotBeNull();
 
@@ -194,7 +184,7 @@ namespace pfDataSource.Test
 
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, "123456789", "some-secret-key");
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration);
 
             result.Should().NotBeNull();
 

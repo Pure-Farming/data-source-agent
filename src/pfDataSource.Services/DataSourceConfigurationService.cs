@@ -37,16 +37,12 @@ namespace pfDataSource.Services
             if (found is null) return null;
 
             var a = Assembly.GetAssembly(typeof(Common.Configuration.EmptyConfiguration));
-            var sourceType = a.GetType(found.SourceType);
 
-            var secretId = string.IsNullOrWhiteSpace(found.AwsSecrectId) ? null : encryptionProvider.Decrypt(found.AwsSecrectId);
-            var secretKey = string.IsNullOrWhiteSpace(found.AwsSecretKey) ? null : encryptionProvider.Decrypt(found.AwsSecretKey);
-
-            return BuildConfigurationObject(found, secretId, secretKey, sourceType);
+            return BuildConfigurationObject(found);
 
         }
 
-        internal DataSourceConfiguration BuildConfigurationObject(Db.Models.SourceConfiguration found, string SecretId, string SecretKey, Type sourceType = null)
+        internal DataSourceConfiguration BuildConfigurationObject(Db.Models.SourceConfiguration found)
         {
             return new DataSourceConfiguration
             {
@@ -56,29 +52,20 @@ namespace pfDataSource.Services
                 SourceType = found.SourceType,
                 DisplayType = found.DisplayType,
                 TempFilesPath = found.TempFilesPath,
-                Aws = new DataSourceConfiguration.AwsConfiguration
-                {
-                    S3BucketArn = found.AwsS3BucketArn,
-                    SecretId = SecretId,
-                    SecretKey = SecretKey
-                },
                 Configuration = found.Configuration is null ?
                     null :
                     JsonConvert.DeserializeObject<Models.FileConfiguration>(found.Configuration)
             };
         }
 
-        internal SourceConfiguration BuildSourceObject(Db.Models.SourceConfiguration found, DataSourceConfiguration configuration, string secrectId, string secretKey)
+        internal SourceConfiguration BuildSourceObject(Db.Models.SourceConfiguration found, DataSourceConfiguration configuration)
         {
             found.DisplayName = configuration.DisplayName;
             found.PureFarmingFullSourceName = $"com.purefarming.data-source.{configuration.FullName}";
             found.PureFarmingSourceName = configuration.Name;
             found.SourceType = configuration.SourceType;
             found.DisplayType = configuration.DisplayType;
-            found.AwsS3BucketArn = configuration.Aws?.S3BucketArn;
             found.TempFilesPath = configuration.TempFilesPath;
-            found.AwsSecrectId = secrectId;
-            found.AwsSecretKey = secretKey;
 
             if (configuration.Configuration is not null)
                 found.Configuration = JsonConvert.SerializeObject(configuration.Configuration);
@@ -95,10 +82,7 @@ namespace pfDataSource.Services
                 this.context.SourceConfigurations.Add(found);
             }
 
-            var secrectId = string.IsNullOrWhiteSpace(configuration.Aws?.SecretId) ? null : encryptionProvider.Encrypt(configuration.Aws.SecretId);
-            var secretKey = string.IsNullOrWhiteSpace(configuration.Aws?.SecretKey) ? null : encryptionProvider.Encrypt(configuration.Aws.SecretKey);
-
-            found = BuildSourceObject(found, configuration, secrectId, secretKey);
+            found = BuildSourceObject(found, configuration);
 
             await this.context.SaveChangesAsync();
         }
