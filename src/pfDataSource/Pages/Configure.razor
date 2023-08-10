@@ -49,9 +49,10 @@
                 <label for="dataSourceFullName" class="form-label">Full Name</label>
                 <div class="input-group">
                     <label class="input-group-text">com.purefarming.data-source.</label>
-                    <input class="form-control" id="dataSourceFullName" aria-describedby="dataSourceFullNameHelp" @bind="configuration.FullName" />
+                    <InputText class="form-control" id="dataSourceFullName" aria-describedby="dataSourceFullNameHelp" @bind-Value="configuration.FullName" />
                 </div>
                 <div id="dataSourceFullNameHelp" class="form-text">The full, reverse DNS name of the Pure Farming Data source, e.g. com.purefarming.data-source.farm-metrics</div>
+                <ValidationMessage For="@(() => configuration.FullName)" />
             </div>
         </div>
         <div class="row"><div class="col">&nbsp;</div></div>
@@ -63,8 +64,11 @@
         <div class="row">
             <div class="col">
                 <label for="filePath" class="form-label">File Path</label>
-                <input type="text" class="form-control" id="filePath" aria-describedby="filePathHelp" @bind="fileConfiguration.Path" />
+                <InputText data-val="true" type="text" class="form-control" id="filePath" aria-describedby="filePathHelp" @bind-Value="fileConfiguration.Path" />
                 <div id="filePathHelp" class="form-text">The path to where files will be retrieved from, e.g. /etc/pure-farming</div>
+                
+                <ValidationMessage For="@(() => fileConfiguration.Path)" />
+                
             </div>
             <div class="col">
                 <label for="fileType" class="form-label">File Type</label>
@@ -104,8 +108,10 @@
             {
                 <div class="col">
                     <label for="submissionDelay" class="form-label">Polling Expression <small class="text-body-secondary">(CRON)</small></label>
-                    <input class="form-control" type="text" @bind="fileConfiguration.CronExpression" />
+                    <InputText data-val="true" class="form-control" type="text" @bind-Value="fileConfiguration.CronExpression" />
                     <div id="submissionDelayHelp" class="form-text">How often to check the specified directory for new files.</div>
+                    <ValidationMessage For="@(() => fileConfiguration.CronExpression)" />
+                 
                 </div>
             }
         </div>
