@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Configuration;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.JSInterop;
 using pfDataSource.Common;
+using Serilog;
 
 namespace pfDataSource.Pages
 {
@@ -17,8 +19,9 @@ namespace pfDataSource.Pages
         private Type configurationDisplayType => Type.GetType(configurationDisplayTypeName);
         private Dictionary<string, object> connectionConfiguration = new Dictionary<string, object>();
         private IJSObjectReference module;
+        private EditContext? editContext;
 
-     
+
         protected override async Task OnInitializedAsync()
         {
             configuration = await DataSourceConfigurationService.GetAsync();
@@ -37,10 +40,16 @@ namespace pfDataSource.Pages
             {
                 Value = configuration.DisplayType
             });
+
+            editContext = new(configuration);
         }
 
         private void HandleValidSubmit() {
-            OnFormSubmit();
+
+            if(editContext != null && editContext.Validate())
+            {
+                OnFormSubmit();
+            }
         }
 
         private async Task OnFormSubmit()
