@@ -14,15 +14,18 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.DataProtection;
-using pfDataSource.Services.Models;
+using pfDataSource.Services;
+using System.ComponentModel.DataAnnotations;
+using Xunit.Sdk;
 
 namespace pfDataSource.Test
 {
     public class DataSourceConfigurationServiceTests
     {
-        private SourceConfiguration _sourceConfiguration;    
+        private SourceConfiguration _sourceConfiguration;
+        private FileConfiguration _fileConfiguration;
 
-        private Services.Models.DataSourceConfiguration _dataSourceConfiguration;
+        private DataSourceConfiguration _dataSourceConfiguration;
 
         public DataSourceConfigurationServiceTests() {
 
@@ -40,20 +43,24 @@ namespace pfDataSource.Test
                 AwsS3BucketArn = "aws::arn"
             };
 
-            _dataSourceConfiguration = new Services.Models.DataSourceConfiguration
+            _dataSourceConfiguration = new DataSourceConfiguration
             {
                 DisplayName = "Test",
                 Name = "Test Source",
                 FullName = "Full Test Source",
                 SourceType = "test-type",
                 DisplayType = "test",
-                TempFilesPath = "/local/dir",
-                Aws = new Services.Models.DataSourceConfiguration.AwsConfiguration
-                {
-                    S3BucketArn = "aws::arn",
-                    SecretId = "123456789",
-                    SecretKey = "some-secret-key"
-                }
+                TempFilesPath = "/local/dir"
+            };
+
+
+            _fileConfiguration = new FileConfiguration
+            {
+                Path = "C:\\test\\dir",
+                FileType = "CSV",
+                SubmissionDelay = 0,
+                WatchDirectory = false,
+                CronExpression = "* * * * *"
             };
 
         }
@@ -65,7 +72,7 @@ namespace pfDataSource.Test
            
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
+            var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration);
 
             result.Should().NotBeNull();
 
@@ -75,9 +82,6 @@ namespace pfDataSource.Test
             result.TempFilesPath.Should().Be("/local/dir");
             result.Name.Should().Be("Test Source");
             result.FullName.Should().Be("Full Test Source");
-            result.Aws.S3BucketArn.Should().Be("aws::arn");
-            result.Aws.SecretId.Should().Be("123456789");
-            result.Aws.SecretKey.Should().Be("some-secret-key");
             result.Configuration.Should().BeNull();
 
         }
@@ -89,9 +93,9 @@ namespace pfDataSource.Test
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
             // Test with configuration object
-            _sourceConfiguration.Configuration = JsonConvert.SerializeObject(new { prop1 = "value1", prop2 = "value2" });
+            _sourceConfiguration.Configuration = JsonConvert.SerializeObject(_fileConfiguration);
 
-            var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey, typeof(object));
+            var result = dataSourceConfigurationServiceMock.BuildConfigurationObject(_sourceConfiguration);
 
             result.Should().NotBeNull();
 
@@ -107,7 +111,7 @@ namespace pfDataSource.Test
     
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration);
 
             result.Should().NotBeNull();
 
@@ -131,14 +135,13 @@ namespace pfDataSource.Test
 
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            _dataSourceConfiguration.Configuration = new { prop1 = "value1", prop2 = "value2" };
+            _dataSourceConfiguration.Configuration = _fileConfiguration;
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, _sourceConfiguration.AwsSecrectId, _sourceConfiguration.AwsSecretKey);
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration);
 
             result.Should().NotBeNull();
 
             result.Configuration.Should().Be(_sourceConfiguration.Configuration);
-
 
         }
 
@@ -152,7 +155,7 @@ namespace pfDataSource.Test
 
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, "123456789", "some-secret-key");
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration);
 
             result.Should().NotBeNull();
 
@@ -177,11 +180,11 @@ namespace pfDataSource.Test
             // Reset SourceConfiguration for create testing
             _sourceConfiguration = new SourceConfiguration();
 
-            _dataSourceConfiguration.Configuration = new { prop1 = "value1", prop2 = "value2" };
+            _dataSourceConfiguration.Configuration = _fileConfiguration;
 
             var dataSourceConfigurationServiceMock = new DataSourceConfigurationService();
 
-            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration, "123456789", "some-secret-key");
+            var result = dataSourceConfigurationServiceMock.BuildSourceObject(_sourceConfiguration, _dataSourceConfiguration);
 
             result.Should().NotBeNull();
 

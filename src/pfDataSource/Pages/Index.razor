@@ -47,29 +47,3 @@
         </div>
     }
 </div>
-
-@code {
-    private string displayName;
-    private string tempFilesPath;
-    private Services.Models.DataSourceConfiguration configuration;
-
-    private async Task OnFormSubmit()
-    {
-        configuration.DisplayName = displayName;
-        await ConfigurationService.SaveAsync(configuration);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        configuration = await ConfigurationService.GetAsync();
-        if (configuration is null)
-        {
-            configuration = new Services.Models.DataSourceConfiguration()
-            {
-                DisplayType = typeof(Pages.Partials.EmptyConfiguration).FullName,
-                SourceType = typeof(Common.Configuration.EmptyConfiguration).Name
-            };
-            tempFilesPath = AppDomain.CurrentDomain.BaseDirectory;
-        }
-    }
-}

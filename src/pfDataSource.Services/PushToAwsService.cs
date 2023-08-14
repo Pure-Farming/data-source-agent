@@ -31,7 +31,7 @@ namespace pfDataSource.Services
 			var fileName = fileInfo.Name;
 			var s3BucketPath = Path.Combine(ingestion, DateTime.Now.ToString("yyyy-MM-dd"), fileName);
 
-			await this.amazonS3.UploadObjectFromFilePathAsync(configuration.Aws.S3BucketArn,
+			await this.amazonS3.UploadObjectFromFilePathAsync(configuration.S3BucketArn,
 				s3BucketPath,
 				filePath,
 				new Dictionary<string,  object>());

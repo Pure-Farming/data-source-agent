@@ -27,10 +27,11 @@ namespace pfDataSource.Services
 			var configuration = await this.dataSourceConfigurationService.GetAsync();
             RemoveRecurringJobs();
 
-			if (configuration.SourceType == typeof(FileConfiguration).FullName)
+			if (configuration.SourceType == typeof(FileConfiguration).FullName) {
 				ConfigureFile(configuration);
-			else if (configuration.SourceType == typeof(DatabaseConfiguration).FullName)
-                ConfigureDatabase(configuration);
+			}
+			//else if (configuration.SourceType == typeof(DatabaseConfiguration).FullName)
+               // ConfigureDatabase(configuration);
 		}
 
 		private static void RemoveRecurringJobs()
@@ -40,7 +41,7 @@ namespace pfDataSource.Services
 				RecurringJob.RemoveIfExists(recurringJob.Id);
 		}
 
-		private static void ConfigureDatabase(Models.DataSourceConfiguration configuration)
+		private static void ConfigureDatabase(DataSourceConfiguration configuration)
 		{
 			var dbConfiguration = configuration.Configuration as DatabaseConfiguration;
 			if (dbConfiguration == null) return;
@@ -54,7 +55,7 @@ namespace pfDataSource.Services
 			}
 		}
 
-		private void ConfigureFile(Models.DataSourceConfiguration configuration)
+		private void ConfigureFile(DataSourceConfiguration configuration)
 		{
 			var fileConfiguration = configuration.Configuration as FileConfiguration;
 			if (fileConfiguration == null) return;

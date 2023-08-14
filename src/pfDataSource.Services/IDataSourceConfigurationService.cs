@@ -7,9 +7,9 @@ namespace pfDataSource.Services
 	public interface IDataSourceConfigurationService
 	{
 
-        Task<Models.DataSourceConfiguration> GetAsync();
+        Task<Common.Configuration.DataSourceConfiguration> GetAsync();
 
-		Task SaveAsync(Models.DataSourceConfiguration configuration);
+		Task SaveAsync(Common.Configuration.DataSourceConfiguration configuration);
 	}
 }
 
