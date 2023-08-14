@@ -28,10 +28,11 @@ namespace pfDataSource.Services
 			var configuration = await this.dataSourceConfigurationService.GetAsync();
             RemoveRecurringJobs();
 
-			if (configuration.SourceType == typeof(FileConfiguration).FullName)
+			if (configuration.SourceType == typeof(FileConfiguration).FullName) {
 				ConfigureFile(configuration);
-			else if (configuration.SourceType == typeof(DatabaseConfiguration).FullName)
-                ConfigureDatabase(configuration);
+			}
+			//else if (configuration.SourceType == typeof(DatabaseConfiguration).FullName)
+               // ConfigureDatabase(configuration);
 		}
 
 		private static void RemoveRecurringJobs()

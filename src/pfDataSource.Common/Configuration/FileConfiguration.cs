@@ -3,7 +3,7 @@ using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace pfDataSource.Services.Models
+namespace pfDataSource.Common.Configuration
 {
 	public class FileConfiguration
 	{

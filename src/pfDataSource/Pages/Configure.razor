@@ -58,63 +58,129 @@
         <div class="row"><div class="col">&nbsp;</div></div>
         <div class="row">
             <div class="col">
-                <h5>File Source Configuration</h5>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <label for="filePath" class="form-label">File Path</label>
-                <InputText data-val="true" type="text" class="form-control" id="filePath" aria-describedby="filePathHelp" @bind-Value="fileConfiguration.Path" />
-                <div id="filePathHelp" class="form-text">The path to where files will be retrieved from, e.g. /etc/pure-farming</div>
-                
-                <ValidationMessage For="@(() => fileConfiguration.Path)" />
-                
-            </div>
-            <div class="col">
-                <label for="fileType" class="form-label">File Type</label>
-                <select id="fileType" class="form-select" aria-label="File Type" @bind="fileConfiguration.FileType">
-                    <option selected>Select the File Type</option>
-                    <option value=".csv">CSV</option>
-                    <option value=".tsv">TSV</option>
+                <label for="displayType" class="form-label">Data source method</label>
+                <select id="displayType" class="form-select" aria-label="Display Type" @bind="configuration.DisplayType">
+                    <option value="FileConfiguration">File based solution</option>
+                    <option value="DatabaseConfiguration">Database solution</option>
                 </select>
-                <div id="fileTypeHelp" class="form-text">The name of the Pure Farming Data source, e.g. farm-metrics</div>
+                <div id="displayTypeHelp" class="form-text">Select how you want to gather source data</div>
             </div>
+            <div class="col">&nbsp;</div>
         </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" @bind="watchDirectory" id="watchDirectory" />
-                    <label class="form-check-label" for="watchDirectory">Watch Directory?</label>
-                </div>
-                <div class="form-text">Whether or not to watch the provided directory for changes.</div>
-            </div>
-            @if (watchDirectory)
-            {
+        <div class="row"><div class="col">&nbsp;</div></div>
+        @if (configuration.DisplayType == "FileConfiguration")
+        {
 
+            <div class="row">
                 <div class="col">
-                    <label for="submissionDelay" class="form-label">Submission Delay <small class="text-body-secondary">(Minutes)</small></label>
-                    <select id="submissionDelay" class="form-select" aria-label="Submission Delay" @bind="fileConfiguration.SubmissionDelay" disabled="@(watchDirectory == false)">
-                        <option value="0">No-Delay</option>
-                        <option value="60">1 Minute</option>
-                        <option value="120">2 Minutes</option>
-                        <option value="180">3 Minutes</option>
-                        <option value="240">4 Minutes</option>
-                        <option value="300">5 Minutes</option>
+                    <h5>File Source Configuration</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="filePath" class="form-label">File Path</label>
+                    <InputText data-val="true" type="text" class="form-control" id="filePath" aria-describedby="filePathHelp" @bind-Value="fileConfiguration.Path" />
+                    <div id="filePathHelp" class="form-text">The path to where files will be retrieved from, e.g. /etc/pure-farming</div>
+                
+                    <ValidationMessage For="@(() => fileConfiguration.Path)" />
+                
+                </div>
+                <div class="col">
+                    <label for="fileType" class="form-label">File Type</label>
+                    <select id="fileType" class="form-select" aria-label="File Type" @bind="fileConfiguration.FileType">
+                        <option selected>Select the File Type</option>
+                        <option value=".csv">CSV</option>
+                        <option value=".tsv">TSV</option>
                     </select>
-                    <div id="submissionDelayHelp" class="form-text">How long to delay a file being sent, from when the change is detected on disk.</div>
+                    <div id="fileTypeHelp" class="form-text">The name of the Pure Farming Data source, e.g. farm-metrics</div>
                 </div>
-            }
-            else
-            {
+            </div>
+    
+            <div class="row">
                 <div class="col">
-                    <label for="submissionDelay" class="form-label">Polling Expression <small class="text-body-secondary">(CRON)</small></label>
-                    <InputText data-val="true" class="form-control" type="text" @bind-Value="fileConfiguration.CronExpression" />
-                    <div id="submissionDelayHelp" class="form-text">How often to check the specified directory for new files.</div>
-                    <ValidationMessage For="@(() => fileConfiguration.CronExpression)" />
-                 
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" @bind="watchDirectory" id="watchDirectory" />
+                        <label class="form-check-label" for="watchDirectory">Watch Directory?</label>
+                    </div>
+                    <div class="form-text">Whether or not to watch the provided directory for changes.</div>
                 </div>
-            }
-        </div>
+                @if (watchDirectory)
+                {
+
+                    <div class="col">
+                        <label for="submissionDelay" class="form-label">Submission Delay <small class="text-body-secondary">(Minutes)</small></label>
+                        <select id="submissionDelay" class="form-select" aria-label="Submission Delay" @bind="fileConfiguration.SubmissionDelay" disabled="@(watchDirectory == false)">
+                            <option value="0">No-Delay</option>
+                            <option value="60">1 Minute</option>
+                            <option value="120">2 Minutes</option>
+                            <option value="180">3 Minutes</option>
+                            <option value="240">4 Minutes</option>
+                            <option value="300">5 Minutes</option>
+                        </select>
+                        <div id="submissionDelayHelp" class="form-text">How long to delay a file being sent, from when the change is detected on disk.</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="col">
+                        <label for="submissionDelay" class="form-label">Polling Expression <small class="text-body-secondary">(CRON)</small></label>
+                        <InputText data-val="true" class="form-control" type="text" @bind-Value="fileConfiguration.CronExpression" />
+                        <div id="submissionDelayHelp" class="form-text">How often to check the specified directory for new files.</div>
+                        <ValidationMessage For="@(() => fileConfiguration.CronExpression)" />
+                 
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col">
+                    <h5>Database Configuration</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="databaseTechnology" class="form-label">Database Technology</label>
+                    <select id="databaseTechnology" class="form-select" aria-label="File Type" @bind="databaseConfiguration.ServerTechnology">
+                        <option selected>Select the Database Type</option>
+                        <option value="@Common.Configuration.DatabaseConfiguration.Postgres">PostgreSQL</option>
+                        <option value="@Common.Configuration.DatabaseConfiguration.SqlServer">Microsoft SQL Server</option>
+                        <option value="@Common.Configuration.DatabaseConfiguration.MySql">MySQL / MariaDB</option>
+                    </select>
+                    <div id="databaseTechnologyHelp" class="form-text">The type of database to connect to.</div>
+                </div>
+                <div class="col">
+                    <label for="connectionString" class="form-label">Connection String</label>
+                    <InputText data-val="true" type="text" class="form-control" id="connectionString" aria-describedby="filePathHelp" @bind-Value="databaseConfiguration.ConnectionString" />
+                    <div id="connectionStringHelp" class="form-text">The connection string to use when connecting to the database.</div>
+                    <ValidationMessage For="@(() => databaseConfiguration.ConnectionString)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">&nbsp;</div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h6>Queries</h6>
+                </div>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">CRON-Tab</th>
+                        <th scope="col">Query</th>
+                        <th scope="col" class="d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-outline-primary align-right">
+                                <span class="oi oi-plus"></span> Add
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        }
+
     </EditForm>
 </div>
 

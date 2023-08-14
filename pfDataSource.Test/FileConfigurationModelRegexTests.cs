@@ -15,7 +15,7 @@ namespace pfDataSource.Test
         [Fact]
         public void FileConfigurationModelRegexTests_Validate_Path_Regex()
         {
-            var pathRegex = typeof(FileConfiguration).GetProperty("Path").GetAttribute<RegularExpressionAttribute>();
+            var pathRegex = typeof(Common.Configuration.FileConfiguration).GetProperty("Path").GetAttribute<RegularExpressionAttribute>();
 
             var regexPattern = pathRegex.Pattern;
 
@@ -27,7 +27,7 @@ namespace pfDataSource.Test
         [Fact]
         public void FileConfigurationModelRegexTests_Validate_Correct_CronExpressions()
         {
-            var pathRegex = typeof(FileConfiguration).GetProperty("CronExpression").GetAttribute<RegularExpressionAttribute>();
+            var pathRegex = typeof(Common.Configuration.FileConfiguration).GetProperty("CronExpression").GetAttribute<RegularExpressionAttribute>();
 
             var regexPattern = pathRegex.Pattern;
 
@@ -50,7 +50,7 @@ namespace pfDataSource.Test
         [Fact]
         public void FileConfigurationModelRegexTests_Validate_InCorrect_CronExpressions()
         {
-            var pathRegex = typeof(FileConfiguration).GetProperty("CronExpression").GetAttribute<RegularExpressionAttribute>();
+            var pathRegex = typeof(Common.Configuration.FileConfiguration).GetProperty("CronExpression").GetAttribute<RegularExpressionAttribute>();
 
             Regex.Match("* * * * * *", pathRegex.Pattern).Success.Should().BeFalse(); //to many params, 6
             Regex.Match("* * * *", pathRegex.Pattern).Success.Should().BeFalse(); //to few params, 4

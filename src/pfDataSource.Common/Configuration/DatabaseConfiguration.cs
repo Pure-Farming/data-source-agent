@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace pfDataSource.Common.Configuration
 {
@@ -9,9 +10,11 @@ namespace pfDataSource.Common.Configuration
 		public const string SqlServer = "SQL Server";
 		public const string MySql = "MySQL";
 
+		[Required]
 		public string ConnectionString { get; set; }
 		public string ServerTechnology { get; set; }
-		public List<DatabaseQuery> Queries { get; set; }
+
+        public List<DatabaseQuery> Queries { get; set; }
 	}
 
 	public class DatabaseQuery

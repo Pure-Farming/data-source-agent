@@ -44,6 +44,21 @@ namespace pfDataSource.Services
 
         internal DataSourceConfiguration BuildConfigurationObject(Db.Models.SourceConfiguration found)
         {
+
+            object config = null;
+
+            if (found.Configuration is not null)
+            {
+                if (found.DisplayType == "FileConfiguration")
+                {
+                    config = JsonConvert.DeserializeObject<Common.Configuration.FileConfiguration>(found.Configuration);
+                }
+                else
+                {
+                    config = JsonConvert.DeserializeObject<Common.Configuration.DatabaseConfiguration>(found.Configuration);
+                }
+            }
+
             return new DataSourceConfiguration
             {
                 DisplayName = found.DisplayName,
@@ -52,9 +67,7 @@ namespace pfDataSource.Services
                 SourceType = found.SourceType,
                 DisplayType = found.DisplayType,
                 TempFilesPath = found.TempFilesPath,
-                Configuration = found.Configuration is null ?
-                    null :
-                    JsonConvert.DeserializeObject<Models.FileConfiguration>(found.Configuration)
+                Configuration = config
             };
         }
 
@@ -81,6 +94,8 @@ namespace pfDataSource.Services
                 found = new Db.Models.SourceConfiguration();
                 this.context.SourceConfigurations.Add(found);
             }
+
+            this.logger.Information($"configuration data: {JsonConvert.SerializeObject(configuration)}");
 
             found = BuildSourceObject(found, configuration);
 

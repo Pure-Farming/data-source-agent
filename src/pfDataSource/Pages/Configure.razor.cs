@@ -6,13 +6,21 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.JSInterop;
 using pfDataSource.Common;
 using Serilog;
+using Newtonsoft.Json;
 
 namespace pfDataSource.Pages
 {
 	public partial class Configure
 	{
         private Services.Models.DataSourceConfiguration configuration;
-        private Services.Models.FileConfiguration fileConfiguration;
+        private Common.Configuration.FileConfiguration fileConfiguration;
+        private Common.Configuration.DatabaseConfiguration databaseConfiguration;
+
+        private string ServerTechnology = "";
+        private string ConnectionString = "";
+
+        private bool useFileBasedMethod = false;
+
         private Boolean watchDirectory = true;
 
         private string configurationDisplayTypeName = typeof(Partials.EmptyConfiguration).FullName;
@@ -28,20 +36,27 @@ namespace pfDataSource.Pages
             if (configuration is null) configuration = new Services.Models.DataSourceConfiguration();
             configuration.FullName = configuration.FullName?.Replace("com.purefarming.data-source.", string.Empty);
 
-            fileConfiguration = new Services.Models.FileConfiguration();
+            fileConfiguration = new Common.Configuration.FileConfiguration();
+            databaseConfiguration = new Common.Configuration.DatabaseConfiguration();
 
             if (configuration.Configuration is not null)
             {
-                fileConfiguration = (Services.Models.FileConfiguration)configuration.Configuration;
+                if (configuration.DisplayType == "FileConfiguration")
+                {
+                    fileConfiguration = (Common.Configuration.FileConfiguration)configuration.Configuration;
+                }
+                else
+                {
+                    databaseConfiguration = (Common.Configuration.DatabaseConfiguration)configuration.Configuration;
+                }
+
                 watchDirectory = fileConfiguration.WatchDirectory;
             }
 
-            OnDataSourceTypeChanged(new ChangeEventArgs()
-            {
-                Value = configuration.DisplayType
-            });
-
             editContext = new(configuration);
+
+            await JS.InvokeVoidAsync("console.log", JsonConvert.SerializeObject(configuration));
+
         }
 
         private void HandleValidSubmit() {
@@ -68,7 +83,14 @@ namespace pfDataSource.Pages
                     fileConfiguration.WatchDirectory = false;
                 }
 
-                configuration.Configuration = fileConfiguration;
+                if (configuration.DisplayType == "FileConfiguration")
+                {
+                    configuration.Configuration = fileConfiguration;
+                }
+                else
+                {
+                    configuration.Configuration = databaseConfiguration;
+                }
 
                 await DataSourceConfigurationService.SaveAsync(configuration);
                 await ConfigurationService.Configure();
@@ -82,6 +104,7 @@ namespace pfDataSource.Pages
             }
         }
 
+        /*
         private void OnDataSourceTypeChanged(ChangeEventArgs args = null)
         {
             if (configuration == null) return;
@@ -108,6 +131,7 @@ namespace pfDataSource.Pages
 
             SetDataSourceType(displayType, incomingConfiguration);
         }
+        */
 
         private void SetDataSourceType(Type type, object config)
         {
