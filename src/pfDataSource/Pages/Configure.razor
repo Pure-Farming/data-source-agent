@@ -27,6 +27,7 @@
     </div>
     <EditForm Model="@configuration" OnValidSubmit="@HandleValidSubmit">
         <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="row">
             <div class="col">
                 <h2>Configuration</h2>
@@ -87,11 +88,11 @@
                 </div>
                 <div class="col">
                     <label for="fileType" class="form-label">File Type</label>
-                    <select id="fileType" class="form-select" aria-label="File Type" @bind="fileConfiguration.FileType">
+                    <InputSelect  id="fileType" class="form-select" aria-label="File Type" @bind-Value="fileConfiguration.FileType">
                         <option selected>Select the File Type</option>
                         <option value=".csv">CSV</option>
                         <option value=".tsv">TSV</option>
-                    </select>
+                    </InputSelect>
                     <div id="fileTypeHelp" class="form-text">The name of the Pure Farming Data source, e.g. farm-metrics</div>
                 </div>
             </div>
@@ -142,18 +143,20 @@
             <div class="row">
                 <div class="col">
                     <label for="databaseTechnology" class="form-label">Database Technology</label>
-                    <select id="databaseTechnology" class="form-select" aria-label="File Type" @bind="databaseConfiguration.ServerTechnology">
+                    <InputSelect id="databaseTechnology" class="form-select" aria-label="File Type" @bind-Value="databaseConfiguration.ServerTechnology">
                         <option selected>Select the Database Type</option>
                         <option value="@Common.Configuration.DatabaseConfiguration.Postgres">PostgreSQL</option>
                         <option value="@Common.Configuration.DatabaseConfiguration.SqlServer">Microsoft SQL Server</option>
                         <option value="@Common.Configuration.DatabaseConfiguration.MySql">MySQL / MariaDB</option>
-                    </select>
+                    </InputSelect>
                     <div id="databaseTechnologyHelp" class="form-text">The type of database to connect to.</div>
                 </div>
                 <div class="col">
                     <label for="connectionString" class="form-label">Connection String</label>
                     <InputText data-val="true" type="text" class="form-control" id="connectionString" aria-describedby="filePathHelp" @bind-Value="databaseConfiguration.ConnectionString" />
-                    <div id="connectionStringHelp" class="form-text">The connection string to use when connecting to the database.</div>
+                    <div id="connectionStringHelp" class="form-text">The connection string to use when connecting to the database.
+                        <span><i>Example: Server=127.0.0.1;Port=5432;Database=myDataBase;User Id=myUsername;Password=myPassword;</i></span>
+                    </div>
                     <ValidationMessage For="@(() => databaseConfiguration.ConnectionString)" />
                 </div>
             </div>
@@ -172,15 +175,77 @@
                         <th scope="col">CRON-Tab</th>
                         <th scope="col">Query</th>
                         <th scope="col" class="d-md-flex justify-content-md-end">
-                            <button type="button" class="btn btn-outline-primary align-right">
+                            <button type="button" class="btn btn-outline-primary align-right" @onclick="OnAddQuery">
                                 <span class="oi oi-plus"></span> Add
                             </button>
                         </th>
                     </tr>
                 </thead>
+                <tbody class="table-group-divider">
+
+                    @foreach (var q in databaseConfiguration.Queries)
+                    {
+
+                    <tr>
+                            <td class="align-middle">@q.Name</td>
+                            <td class="align-middle font-monospace">@q.CronExpression</td>
+                            <td class="align-middle font-monospace text-truncate">@q.Query</td>
+                        <td class="d-md-flex justify-content-md-end">
+                            <button type="button"
+                                    class="btn btn-outline-secondary btn-sm"
+                                @onclick="@(() => OnEditClick(q))">
+                                <span class="oi oi-pencil"></span>
+                            </button>
+                            &nbsp;
+                                <button type="button" class="btn btn-outline-danger btn-sm" @onclick="@(() => OnDeleteClick(q))">
+                                <span class="oi oi-trash"></span>
+                            </button>
+                        </td>
+                    </tr>
+
+                    }
+
+                </tbody>
             </table>
         }
 
     </EditForm>
+
+
+    <div class="modal" tabindex="-1" id="addNewModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>New Query</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <label for="queryName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="queryName" @bind="tempQuery.Name" />
+                            <div class="invalid-feedback">Name is required</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="cronExpression" class="form-label">CRON Expression</label>
+                            <input type="text" class="form-control" id="cronExpression" @bind="tempQuery.CronExpression" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="queryValue" class="form-label">Query</label>
+                            <Blace.Components.Editor @ref="Edit" T="Data.SqlEditorFile" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="OnDismissAdd">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="OnSaveAdd">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 

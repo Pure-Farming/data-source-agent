@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.DataProtection;
-using pfDataSource.Services.Models;
+using pfDataSource.Services;
 using System.ComponentModel.DataAnnotations;
 using Xunit.Sdk;
 
@@ -25,7 +25,7 @@ namespace pfDataSource.Test
         private SourceConfiguration _sourceConfiguration;
         private FileConfiguration _fileConfiguration;
 
-        private Services.Models.DataSourceConfiguration _dataSourceConfiguration;
+        private DataSourceConfiguration _dataSourceConfiguration;
 
         public DataSourceConfigurationServiceTests() {
 
@@ -43,7 +43,7 @@ namespace pfDataSource.Test
                 AwsS3BucketArn = "aws::arn"
             };
 
-            _dataSourceConfiguration = new Services.Models.DataSourceConfiguration
+            _dataSourceConfiguration = new DataSourceConfiguration
             {
                 DisplayName = "Test",
                 Name = "Test Source",

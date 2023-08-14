@@ -10,6 +10,8 @@ namespace pfDataSource.Common.Configuration
         [Required]
         [RegularExpression(@"(\/.*|[a-zA-Z]:\\(?:([^<>:""\/\\|?*]*[^<>:""\/\\|?*.]\\|..\\)*([^<>:""\/\\|?*]*[^<>:""\/\\|?*.]\\?|..\\))?)", ErrorMessage = "Please provide a valid path. Windows paths must start with the drive, eg C:.")]
         public string Path { get; set; }
+
+        [Required]
         public string FileType { get; set; }
 		public int SubmissionDelay { get; set; } = 0;
 		public bool WatchDirectory { get; set; }

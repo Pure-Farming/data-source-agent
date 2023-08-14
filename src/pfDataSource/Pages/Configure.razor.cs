@@ -7,47 +7,53 @@ using Microsoft.JSInterop;
 using pfDataSource.Common;
 using Serilog;
 using Newtonsoft.Json;
+using pfDataSource.Services;
+using pfDataSource.Common.Configuration;
+using Blace.Components;
 
 namespace pfDataSource.Pages
 {
 	public partial class Configure
 	{
-        private Services.Models.DataSourceConfiguration configuration;
-        private Common.Configuration.FileConfiguration fileConfiguration;
-        private Common.Configuration.DatabaseConfiguration databaseConfiguration;
-
-        private string ServerTechnology = "";
-        private string ConnectionString = "";
+        private DataSourceConfiguration configuration;
+        private FileConfiguration fileConfiguration;
+        private DatabaseConfiguration databaseConfiguration;
+        private DatabaseQuery tempQuery = new DatabaseQuery();
+        private Editor<Data.SqlEditorFile> Edit;
+        private Data.SqlEditorFile tempEditorFile = new Data.SqlEditorFile();
 
         private bool useFileBasedMethod = false;
 
-        private Boolean watchDirectory = true;
+        private bool watchDirectory = true;
 
         private string configurationDisplayTypeName = typeof(Partials.EmptyConfiguration).FullName;
         private Type configurationDisplayType => Type.GetType(configurationDisplayTypeName);
         private Dictionary<string, object> connectionConfiguration = new Dictionary<string, object>();
         private IJSObjectReference module;
         private EditContext? editContext;
+        private bool editContextValidates = false;
 
 
         protected override async Task OnInitializedAsync()
         {
             configuration = await DataSourceConfigurationService.GetAsync();
-            if (configuration is null) configuration = new Services.Models.DataSourceConfiguration();
+            if (configuration is null) configuration = new DataSourceConfiguration();
             configuration.FullName = configuration.FullName?.Replace("com.purefarming.data-source.", string.Empty);
 
-            fileConfiguration = new Common.Configuration.FileConfiguration();
-            databaseConfiguration = new Common.Configuration.DatabaseConfiguration();
+            fileConfiguration = new FileConfiguration();
+            databaseConfiguration = new DatabaseConfiguration();
+            databaseConfiguration.Queries = new List<DatabaseQuery>();
 
             if (configuration.Configuration is not null)
             {
                 if (configuration.DisplayType == "FileConfiguration")
                 {
-                    fileConfiguration = (Common.Configuration.FileConfiguration)configuration.Configuration;
+                    fileConfiguration = (FileConfiguration)configuration.Configuration;
                 }
                 else
                 {
-                    databaseConfiguration = (Common.Configuration.DatabaseConfiguration)configuration.Configuration;
+                    databaseConfiguration = (DatabaseConfiguration)configuration.Configuration;
+                 
                 }
 
                 watchDirectory = fileConfiguration.WatchDirectory;
@@ -55,12 +61,15 @@ namespace pfDataSource.Pages
 
             editContext = new(configuration);
 
-            await JS.InvokeVoidAsync("console.log", JsonConvert.SerializeObject(configuration));
+            await JS.InvokeVoidAsync("console.log", JsonConvert.SerializeObject(databaseConfiguration));
+
+            editContextValidates = editContext.Validate();
 
         }
 
         private void HandleValidSubmit() {
 
+         
             if(editContext != null && editContext.Validate())
             {
                 OnFormSubmit();
@@ -104,34 +113,33 @@ namespace pfDataSource.Pages
             }
         }
 
-        /*
-        private void OnDataSourceTypeChanged(ChangeEventArgs args = null)
+        private async Task OnAddQuery()
         {
-            if (configuration == null) return;
-
-            var incomingValue = args?.Value?.ToString();
-
-            if (string.IsNullOrWhiteSpace(incomingValue))
-                incomingValue = typeof(Partials.EmptyConfiguration).FullName;
-
-            var displayType = Type.GetType(incomingValue);
-            object incomingConfiguration;
-
-            if (displayType.FullName == configuration.DisplayType)
+            tempQuery = new DatabaseQuery();
+            tempEditorFile = new Data.SqlEditorFile();
+            await Edit.Open(tempEditorFile, new Blace.Editing.EditorOptions
             {
-                incomingConfiguration = configuration.Configuration;
-            }
-            else
-            {
-                var incomingConfigurationTypeName = $"pfDataSource.Common.Configuration.{displayType.Name}";
-                var a = System.Reflection.Assembly.GetAssembly(typeof(Common.Configuration.EmptyConfiguration));
-                var incomingCongfigurationType = a.GetType(incomingConfigurationTypeName);
-                incomingConfiguration = Activator.CreateInstance(incomingCongfigurationType);
-            }
-
-            SetDataSourceType(displayType, incomingConfiguration);
+                Syntax = Blace.Editing.Syntax.Sql,
+                Theme = Blace.Editing.Theme.Sqlserver
+            });
+            await JS.InvokeVoidAsync("addNewModal", "true");
         }
-        */
+
+        private async Task OnDismissAdd()
+        {
+            await Edit.Close();
+            await JS.InvokeVoidAsync("addNewModal", "false");
+        }
+
+        private async Task OnSaveAdd()
+        {
+            tempQuery.Query = tempEditorFile.Content;
+            var existing = databaseConfiguration.Queries.FirstOrDefault(q => q.Name == tempQuery.Name);
+            if (existing == null)
+                databaseConfiguration.Queries.Add(tempQuery);
+
+            await JS.InvokeVoidAsync("addNewModal", "false");
+        }
 
         private void SetDataSourceType(Type type, object config)
         {
@@ -140,6 +148,27 @@ namespace pfDataSource.Pages
             configuration.SourceType = $"pfDataSource.Common.Configuration.{type.Name}";
             configuration.Configuration = config;
             connectionConfiguration = new Dictionary<string, object> { { "Item", config } };
+        }
+
+        private async Task OnEditClick(DatabaseQuery item)
+        {
+            tempQuery = item;
+            tempEditorFile = new Data.SqlEditorFile()
+            {
+                Sql = tempQuery.Query
+            };
+
+            await Edit.Open(tempEditorFile, new Blace.Editing.EditorOptions
+            {
+                Syntax = Blace.Editing.Syntax.Sql,
+                Theme = Blace.Editing.Theme.Sqlserver
+            });
+            await JS.InvokeVoidAsync("addNewModal", "true");
+        }
+
+        private void OnDeleteClick(DatabaseQuery item)
+        {
+            databaseConfiguration.Queries.Remove(item);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

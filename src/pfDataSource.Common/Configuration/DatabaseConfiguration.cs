@@ -4,15 +4,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace pfDataSource.Common.Configuration
 {
-	public class DatabaseConfiguration : DataSourceConfiguration
+	public class DatabaseConfiguration : DataSourceConfigurationBase
 	{
 		public const string Postgres = "PostgreSQL";
 		public const string SqlServer = "SQL Server";
 		public const string MySql = "MySQL";
 
 		[Required]
-		public string ConnectionString { get; set; }
-		public string ServerTechnology { get; set; }
+        public string ConnectionString { get; set; }
+
+        [Required]
+        public string ServerTechnology { get; set; }
 
         public List<DatabaseQuery> Queries { get; set; }
 	}

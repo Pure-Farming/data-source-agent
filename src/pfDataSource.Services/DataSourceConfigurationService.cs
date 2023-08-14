@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using pfDataSource.Services.Models;
 using pfDataSource.Db;
 using System.Threading.Tasks;
 using System;
@@ -9,6 +8,7 @@ using pfDataSource.Db.Models;
 using System.Configuration;
 using Serilog;
 using Serilog.Sinks.Debug;
+using pfDataSource.Common.Configuration;
 
 namespace pfDataSource.Services
 {

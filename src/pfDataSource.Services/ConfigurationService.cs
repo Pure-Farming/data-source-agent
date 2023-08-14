@@ -3,7 +3,6 @@ using Hangfire;
 using Hangfire.Storage;
 using pfDataSource.Common.Configuration;
 using pfDataSource.Services.Jobs;
-using pfDataSource.Services.Models;
 
 namespace pfDataSource.Services
 {
@@ -42,7 +41,7 @@ namespace pfDataSource.Services
 				RecurringJob.RemoveIfExists(recurringJob.Id);
 		}
 
-		private static void ConfigureDatabase(Models.DataSourceConfiguration configuration)
+		private static void ConfigureDatabase(DataSourceConfiguration configuration)
 		{
 			var dbConfiguration = configuration.Configuration as DatabaseConfiguration;
 			if (dbConfiguration == null) return;
@@ -56,7 +55,7 @@ namespace pfDataSource.Services
 			}
 		}
 
-		private void ConfigureFile(Models.DataSourceConfiguration configuration)
+		private void ConfigureFile(DataSourceConfiguration configuration)
 		{
 			var fileConfiguration = configuration.Configuration as FileConfiguration;
 			if (fileConfiguration == null) return;
