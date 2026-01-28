@@ -11,9 +11,6 @@
             <label for="databaseTechnology" class="form-label">Database Technology</label>
             <select id="databaseTechnology" class="form-select" aria-label="File Type" @bind="Item.ServerTechnology">
                 <option selected>Select the Database Type</option>
-                <option value="@Common.Configuration.DatabaseConfiguration.Postgres">PostgreSQL</option>
-                <option value="@Common.Configuration.DatabaseConfiguration.SqlServer">Microsoft SQL Server</option>
-                <option value="@Common.Configuration.DatabaseConfiguration.MySql">MySQL / MariaDB</option>
             </select>
             <div id="databaseTechnologyHelp" class="form-text">The type of database to connect to.</div>
         </div>
@@ -31,6 +28,7 @@
             <h6>Queries</h6>
         </div>
     </div>
+<!--
     <table class="table table-striped table-hover">
         <thead>
             <tr>
@@ -45,16 +43,18 @@
             </tr>
         </thead>
         <tbody class="table-group-divider">
-            @foreach (var q in Item.Queries)
+           
+            foreach (var q in Item.Queries)
             {
+           
                 <tr>
-                    <td class="align-middle">@q.Name</td>
-                    <td class="align-middle font-monospace">@q.CronExpression</td>
-                    <td class="align-middle font-monospace text-truncate">@q.Query</td>
+                    <td class="align-middle"></td>
+                    <td class="align-middle font-monospace"></td>
+                    <td class="align-middle font-monospace text-truncate"></td>
                     <td class="d-md-flex justify-content-md-end">
                         <button type="button"
                                 class="btn btn-outline-secondary btn-sm"
-                                @onclick="@(e => OnEditClick(q))">
+                                onclick="">
                             <span class="oi oi-pencil"></span>
                         </button>
                         &nbsp;
@@ -63,9 +63,11 @@
                         </button>
                     </td>
                 </tr>
+              
             }
+            
         </tbody>
-    </table>
+    </table>-->
 </div>
 
 <div class="modal" tabindex="-1" id="addNewModal">

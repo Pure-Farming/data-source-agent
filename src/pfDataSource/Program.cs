@@ -44,8 +44,6 @@ builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
 builder.Services.AddScoped<IEncryptionProvider, EncryptionProvider>();
 builder.Services.AddScoped<IDataSourceConfigurationService, DataSourceConfigurationService>();
 builder.Services.AddSingleton(builder.Configuration);
-builder.Services.AddSingleton<IAwsCredentialsService, AwsCredentialsService>();
-builder.Services.AddTransient(async p => await p.GetService<IAwsCredentialsService>().GetCredentialsAsync());
 builder.Services.AddAWSService<IAmazonS3>(ServiceLifetime.Transient);
 builder.Services.AddScoped<IPushToAwsService, PushToAwsService>();
 builder.Services.AddSingleton<Serilog.ILogger>(logger);
