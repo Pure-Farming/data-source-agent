@@ -26,7 +26,7 @@
     <PackageReference Include="Npgsql" />
     <PackageReference Include="Dapper" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
-    <PackageReference Include="MySql.Data" />
+    <PackageReference Include="MySqlConnector" />
     <PackageReference Include="AWSSDK.S3" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
     <PackageReference Include="Serilog" />
