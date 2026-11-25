@@ -20,10 +20,10 @@ jobs:
       vmImage: 'ubuntu-latest'
     steps:
       - task: UseDotNet@2
-        displayName: Use dotnet 7
+        displayName: Use dotnet 10
         inputs:
           packageType: 'sdk'
-          version: '7.0.x'
+          version: '10.0.x'
 
       - task: DotNetCoreCLI@2
         displayName: Restore Test Nuget Packages
