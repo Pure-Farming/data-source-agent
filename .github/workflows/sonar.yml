@@ -68,10 +68,10 @@ jobs:
             -u az -p "${{ secrets.AZURE_DEVOPS_TOKEN }}" \
             --configfile "NuGet.config" \
             --store-password-in-clear-text
-          dotnet build pure-farming-ds.sln
+          dotnet build pure-farming-ds.slnx
           ./.coverlet/coverlet ./pfDataSource.Test/bin/Debug/net7.0/pfDataSource.Test.dll \
             --target "dotnet" \
-            --targetargs "test ./pure-farming-ds.sln --no-build" \
+            --targetargs "test ./pure-farming-ds.slnx --no-build" \
             -f=opencover \
             -o="coverage.xml"
           ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
