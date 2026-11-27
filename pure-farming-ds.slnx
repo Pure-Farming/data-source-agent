@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Packages.props" />
+    <File Path="NuGet.config" />
+  </Folder>
+  <Project Path="pfDataSource.Test/pfDataSource.Test.csproj" />
+  <Project Path="src/pfDataSource.Common/pfDataSource.Common.csproj" />
+  <Project Path="src/pfDataSource.Db/pfDataSource.Db.csproj" />
+  <Project Path="src/pfDataSource.Services/pfDataSource.Services.csproj" />
+  <Project Path="src/pfDataSource/pfDataSource.csproj" />
+  <Project Path="tests/pfDataSource.ApiTests/pfDataSource.ApiTests.csproj" />
+</Solution>
